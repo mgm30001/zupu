@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth/authOptions";
 
+type RouteParams = { params: { id: string } };
+
 export async function GET(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,7 +19,7 @@ export async function GET(
   }
 
   try {
-    const id = context.params.id;
+    const id = params.id;
     
     // 检查是否要包含关系信息
     const { searchParams } = new URL(request.url);
@@ -65,11 +67,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     
     // 获取当前登录用户
     const session = await getServerSession(authOptions);

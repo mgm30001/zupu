@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth/authOptions";
 
+type RouteParams = { params: { id: string } };
+
 // 获取特定关系
 export async function GET(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   const session = await getServerSession(authOptions);
 
@@ -19,7 +21,7 @@ export async function GET(
 
   try {
     // 获取ID
-    const id = context.params.id;
+    const id = params.id;
     
     const relationship = await prisma.relationship.findUnique({
       where: { id },
@@ -52,8 +54,8 @@ export async function GET(
 
 // 删除特定关系
 export async function DELETE(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   const session = await getServerSession(authOptions);
 
@@ -66,7 +68,7 @@ export async function DELETE(
 
   try {
     // 获取ID
-    const id = context.params.id;
+    const id = params.id;
     
     // 检查关系是否存在
     const relationship = await prisma.relationship.findUnique({
