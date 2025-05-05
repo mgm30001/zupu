@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  GUEST
+}
+
+// 家族成员模型
+model Member {
+  id          String    @id @default(cuid())
+  name        String
+  gender      Gender
+  birthDate   DateTime?
+  deathDate   DateTime?
+  photo       String?
+  biography   String?   @db.Text
+  contactInfo Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // 关系
+  parentRelations   Relationship[] @relation("ParentChild_Parent")
+  childRelations    Relationship[] @relation("ParentChild_Child")
+  spouseAsSpouse1   Relationship[] @relation("Spouse1")
+  spouseAsSpouse2   Relationship[] @relation("Spouse2")
+  siblingAsSibling1 Relationship[] @relation("Sibling1")
+  siblingAsSibling2 Relationship[] @relation("Sibling2")
+
+  // 历史事件
+  events Event[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// 关系模型
+model Relationship {
+  id        String       @id @default(cuid())
+  type      RelationType
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // 父子关系
+  parentId String?
+  parent   Member? @relation("ParentChild_Parent", fields: [parentId], references: [id])
+  childId  String?
+  child    Member? @relation("ParentChild_Child", fields: [childId], references: [id])
+
+  // 配偶关系
+  spouse1Id String?
+  spouse1   Member? @relation("Spouse1", fields: [spouse1Id], references: [id])
+  spouse2Id String?
+  spouse2   Member? @relation("Spouse2", fields: [spouse2Id], references: [id])
+
+  // 兄弟姐妹关系
+  sibling1Id String?
+  sibling1   Member? @relation("Sibling1", fields: [sibling1Id], references: [id])
+  sibling2Id String?
+  sibling2   Member? @relation("Sibling2", fields: [sibling2Id], references: [id])
+}
+
+enum RelationType {
+  PARENT_CHILD
+  SPOUSE
+  SIBLING
+}
+
+// 历史事件模型
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  date        DateTime
+  location    String?
+  eventType   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关联的成员
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+}
