@@ -5,7 +5,7 @@ import { authOptions } from "@/app/auth/authOptions";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -17,7 +17,7 @@ export async function GET(
   }
 
   try {
-    const id = params.id;
+    const id = context.params.id;
     
     // 检查是否要包含关系信息
     const { searchParams } = new URL(request.url);
@@ -52,7 +52,6 @@ export async function GET(
     }
 
     // 验证权限：只有创建者才能查看
-    const session = await getServerSession(authOptions);
     const isCreator = session?.user?.id === member.creatorId;
 
     return NextResponse.json({ ...member, isCreator });
@@ -67,10 +66,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const id = params.id;
+    const id = context.params.id;
     
     // 获取当前登录用户
     const session = await getServerSession(authOptions);

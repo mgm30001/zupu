@@ -6,7 +6,7 @@ import { authOptions } from "@/app/auth/authOptions";
 // 获取特定关系
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -18,8 +18,8 @@ export async function GET(
   }
 
   try {
-    // 解包params
-    const { id } = await params;
+    // 获取ID
+    const id = context.params.id;
     
     const relationship = await prisma.relationship.findUnique({
       where: { id },
@@ -53,7 +53,7 @@ export async function GET(
 // 删除特定关系
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -65,8 +65,8 @@ export async function DELETE(
   }
 
   try {
-    // 解包params
-    const { id } = await params;
+    // 获取ID
+    const id = context.params.id;
     
     // 检查关系是否存在
     const relationship = await prisma.relationship.findUnique({
