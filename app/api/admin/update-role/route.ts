@@ -1,8 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { UserRole } from '@prisma/client';
+import { authOptions } from '@/app/auth/authOptions';
+
+// 定义用户角色枚举，与Prisma模型匹配
+enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR'
+}
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -28,7 +34,7 @@ export async function POST(req: Request) {
         email: email,
       },
       data: {
-        role: role as UserRole,
+        role: role,
       },
     });
 

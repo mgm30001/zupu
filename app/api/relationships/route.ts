@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { RelationType } from '@/generated/prisma';
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { authOptions } from "@/app/auth/authOptions";
 
 // 获取所有家族关系
 export async function GET() {
